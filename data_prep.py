@@ -26,8 +26,8 @@ def load_documents():
 
 def split_text(documents: list[Document]):
     text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=500,
-        chunk_overlap=100,
+        chunk_size=1000,
+        chunk_overlap=500,
         length_function=len,
         add_start_index=True,
     )
@@ -37,14 +37,15 @@ def split_text(documents: list[Document]):
     return chunks
 
 def save_to_chroma(chunks: list[Document]):
-    # Clear out the previous Chroma DB
+    # Clear old DB
     if os.path.exists(CHROMA_PATH):
         shutil.rmtree(CHROMA_PATH)
 
-    # Load local MiniLM model for embeddings
+    # Use BGE-large embedding model (BAAI)
     embeddings = HuggingFaceEmbeddings(
-        model_name="sentence-transformers/all-MiniLM-L6-v2",
-        model_kwargs={"device": "cuda"}  # or "cpu" if you don't have a GPU
+        model_name="BAAI/bge-large-en-v1.5",
+        model_kwargs={"device": "cuda"},  # or "cpu"
+        encode_kwargs={"normalize_embeddings": True}  # recommended for BGE
     )
 
     db = Chroma.from_documents(
@@ -53,7 +54,7 @@ def save_to_chroma(chunks: list[Document]):
         persist_directory=CHROMA_PATH
     )
     db.persist()
-    print(f"Saved {len(chunks)} chunks to {CHROMA_PATH} using MiniLM embeddings.")
+    print(f"Saved {len(chunks)} chunks to {CHROMA_PATH} using BGE-Large embeddings.")
 
 if __name__ == "__main__":
     main()
