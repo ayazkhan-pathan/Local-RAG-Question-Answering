@@ -1,2 +1,19 @@
-data
-chroma
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.venv/
+venv/
+
+# Tools
+.pytest_cache/
+.ruff_cache/
+
+# Vector stores and run output (the book in data/books is tracked)
+chroma/
+runs/
+
+# OS files
+.DS_Store

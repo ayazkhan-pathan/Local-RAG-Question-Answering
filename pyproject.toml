@@ -1,0 +1,61 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rag-local"
+version = "0.2.0"
+description = "Question answering over a book with LangChain, Chroma, BGE embeddings and a small local LLM."
+readme = "README.md"
+requires-python = ">=3.9"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Mohammed Ayazkhan Pathan" }]
+keywords = ["rag", "retrieval", "langchain", "chroma", "embeddings", "llm"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Text Processing :: Indexing",
+]
+dependencies = [
+    "chromadb>=0.5",
+    "huggingface-hub>=0.28",
+    "langchain-chroma>=0.2",
+    "langchain-core>=0.3",
+    "langchain-huggingface>=0.1",
+    "langchain-text-splitters>=0.3",
+    "numpy>=1.23",
+    "sentence-transformers>=3.0",
+    "torch>=2.1",
+    "transformers>=4.56",
+]
+
+[project.optional-dependencies]
+figures = [
+    "matplotlib>=3.7",
+    "pillow>=10.1",
+]
+dev = [
+    "pytest>=7",
+    "ruff>=0.6,<0.18",
+]
+
+[project.scripts]
+rag-local = "rag_local.cli:main"
+
+[project.urls]
+Repository = "https://github.com/ayazkhan-pathan/RAG_local"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py39"
+src = ["src", "scripts", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "NPY", "SIM"]
