@@ -1,0 +1,26 @@
+setting,model,chunk_size,chunk_overlap,instruction,boilerplate,score,chunks,over_512_tokens,hit@1,hit@3,hit@5,mrr,context_chars,on_topic_pass,off_topic_pass,threshold,top5_exact,embed_seconds,best
+bge-small_500-100_plain,bge-small,500,100,False,False,cosine,410,0,0.45,0.625,0.675,0.5561,1230.05,1.0,0.3333,0.5,1.0,4.7,False
+bge-small_500-100_instr,bge-small,500,100,True,False,cosine,410,0,0.45,0.625,0.675,0.5662,1255.325,1.0,0.3333,0.5,1.0,4.7,False
+bge-small_1000-200_plain,bge-small,1000,200,False,False,cosine,189,0,0.625,0.775,0.8,0.7148,2574.925,1.0,0.3333,0.5,1.0,5.1,False
+bge-small_1000-200_instr,bge-small,1000,200,True,False,cosine,189,0,0.625,0.725,0.775,0.7105,2531.875,1.0,0.1667,0.5,1.0,5.1,False
+bge-small_1000-500_plain,bge-small,1000,500,False,False,cosine,256,0,0.475,0.675,0.775,0.6063,2591.2,1.0,0.5,0.5,1.0,8.3,False
+bge-small_1000-500_instr,bge-small,1000,500,True,False,cosine,256,0,0.5,0.7,0.825,0.6376,2581.675,1.0,0.1667,0.5,1.0,8.3,False
+bge-small_2000-400_plain,bge-small,2000,400,False,False,cosine,91,22,0.425,0.625,0.775,0.5684,5471.2,1.0,0.3333,0.5,1.0,9.0,False
+bge-small_2000-400_instr,bge-small,2000,400,True,False,cosine,91,22,0.45,0.625,0.675,0.5619,5443.075,1.0,0.1667,0.5,1.0,9.0,False
+bge-base_500-100_plain,bge-base,500,100,False,False,cosine,410,0,0.575,0.65,0.675,0.6369,1267.425,1.0,0.0,0.5,1.0,7.7,False
+bge-base_500-100_instr,bge-base,500,100,True,False,cosine,410,0,0.55,0.65,0.725,0.6299,1234.475,0.975,0.0,0.5,1.0,7.7,False
+bge-base_1000-200_plain,bge-base,1000,200,False,False,cosine,189,0,0.575,0.75,0.825,0.6841,2556.25,1.0,0.0,0.5,1.0,7.1,False
+bge-base_1000-200_instr,bge-base,1000,200,True,False,cosine,189,0,0.6,0.8,0.85,0.7105,2544.95,0.95,0.0,0.5,1.0,7.1,False
+bge-base_1000-500_plain,bge-base,1000,500,False,False,cosine,256,0,0.575,0.75,0.825,0.6802,2599.875,1.0,0.0,0.5,1.0,9.6,False
+bge-base_1000-500_instr,bge-base,1000,500,True,False,cosine,256,0,0.575,0.75,0.8,0.6724,2587.05,0.975,0.0,0.5,1.0,9.6,False
+bge-base_2000-400_plain,bge-base,2000,400,False,False,cosine,91,22,0.425,0.675,0.725,0.5817,5494.45,0.975,0.0,0.5,1.0,7.8,False
+bge-base_2000-400_instr,bge-base,2000,400,True,False,cosine,91,22,0.4,0.675,0.725,0.545,5458.85,0.9,0.0,0.5,1.0,7.8,False
+bge-large_500-100_plain,bge-large,500,100,False,False,cosine,410,0,0.6,0.725,0.775,0.6859,1283.95,1.0,0.0,0.5,1.0,24.3,False
+bge-large_500-100_instr,bge-large,500,100,True,False,cosine,410,0,0.575,0.75,0.8,0.6738,1263.55,1.0,0.1667,0.5,1.0,24.3,False
+bge-large_1000-200_plain,bge-large,1000,200,False,False,cosine,189,0,0.625,0.825,0.875,0.734,2563.925,1.0,0.0,0.5,1.0,22.1,False
+bge-large_1000-200_instr,bge-large,1000,200,True,False,cosine,189,0,0.65,0.825,0.85,0.744,2581.825,1.0,0.0,0.5,1.0,22.1,True
+bge-large_1000-500_plain,bge-large,1000,500,False,False,cosine,256,0,0.55,0.775,0.85,0.6912,2640.425,1.0,0.0,0.5,1.0,36.8,False
+bge-large_1000-500_instr,bge-large,1000,500,True,False,cosine,256,0,0.55,0.775,0.825,0.6839,2650.225,1.0,0.0,0.5,1.0,36.8,False
+bge-large_2000-400_plain,bge-large,2000,400,False,False,cosine,91,22,0.575,0.775,0.875,0.6983,5439.95,0.975,0.0,0.5,1.0,26.8,False
+bge-large_2000-400_instr,bge-large,2000,400,True,False,cosine,91,22,0.525,0.725,0.9,0.6635,5451.825,1.0,0.0,0.5,1.0,26.8,False
+bge-large_1000-500_plain_raw,bge-large,1000,500,False,True,l2 relevance,286,0,0.55,0.775,0.85,0.6912,2640.425,0.875,0.0,0.5,1.0,74.0,False

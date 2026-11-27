@@ -44,7 +44,7 @@ dev = [
 rag-local = "rag_local.cli:main"
 
 [project.urls]
-Repository = "https://github.com/ayazkhan-pathan/RAG_local"
+Repository = "https://github.com/ayazkhan-pathan/Local-RAG-Question-Answering"
 
 [tool.setuptools.packages.find]
 where = ["src"]

@@ -1,0 +1,41 @@
+{
+  "best": {
+    "setting": "bge-large_1000-200_instr",
+    "model": "bge-large",
+    "chunk_size": 1000,
+    "chunk_overlap": 200,
+    "instruction": true,
+    "boilerplate": false,
+    "score": "cosine",
+    "chunks": 189,
+    "over_512_tokens": 0,
+    "hit@1": 0.65,
+    "hit@3": 0.825,
+    "hit@5": 0.85,
+    "mrr": 0.7440354090354091,
+    "context_chars": 2581.825,
+    "on_topic_pass": 1.0,
+    "off_topic_pass": 0.0,
+    "threshold": 0.5,
+    "top5_exact": 1.0,
+    "embed_seconds": 22.1,
+    "best": true
+  },
+  "settings": {
+    "embedding_model": "bge-large",
+    "chunk_size": 1000,
+    "chunk_overlap": 200,
+    "query_instruction": true,
+    "strip_boilerplate": true,
+    "k": 3,
+    "threshold": 0.5
+  },
+  "label": "bge-large 1000/200 +instruction",
+  "rule": "highest hit@3, then highest MRR, then the least context",
+  "pca_variance_share": [
+    0.0624,
+    0.0582
+  ],
+  "nearest_same_chapter": 0.6915,
+  "nearest_same_chapter_by_chance": 0.0751
+}

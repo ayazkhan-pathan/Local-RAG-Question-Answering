@@ -328,8 +328,9 @@ def figure_pipeline(results: Path, out: Path, data: Path, questions_path: Path, 
         color=INK2,
     )
 
-    kept = f"{(book.end - book.start) / 1000:.0f}k characters"
-    dimension = DIMENSIONS.get(settings.embedding_model, "")
+    kept = f"{(book.end - book.start) / 1000:.0f}k chars"
+    dimension = DIMENSIONS.get(settings.embedding_model)
+    numbers = f"{dimension:,} numbers" if dimension else "one vector"
     k, cut = settings.k, settings.threshold
     stations = [
         ("book", "Book", f"{len(book.chapter_starts)} chapters", kept),
@@ -337,9 +338,9 @@ def figure_pipeline(results: Path, out: Path, data: Path, questions_path: Path, 
             "chunks",
             "Chunks",
             f"{summary['chunks']} chunks,",
-            f"{settings.chunk_size:,} chars max",
+            f"≤ {settings.chunk_size:,} chars each",
         ),
-        ("vectors", "Embeddings", settings.embedding_model, f"{dimension} numbers each"),
+        ("vectors", "Embeddings", settings.embedding_model, numbers),
         ("store", "Chroma", "vector index,", "cosine space"),
         ("topk", f"Top {k}", f"{k} closest chunks", f"if score ≥ {cut:.2f}"),
         ("prompt", "Prompt", "passages", "+ question"),
@@ -483,14 +484,17 @@ def figure_book_map(results: Path, out: Path, questions_path: Path, example: str
         ax.plot([qx, cx], [qy, cy], color=ACCENT, linewidth=1.4, zorder=3)
         ax.scatter([cx], [cy], s=170, facecolors="none", edgecolors=ACCENT, linewidths=2, zorder=4)
         tag = f"{rank}, holds the answer" if cid in gold else f"{rank}"
+        # Label on the far side from the question, so the line to the star never crosses it.
+        right, up = cx >= qx, cy >= qy
         ax.annotate(
             tag,
             (cx, cy),
-            xytext=(9, -3),
+            xytext=(11 if right else -11, 6 if up else -6),
             textcoords="offset points",
             fontsize=SMALL,
             color=INK,
-            va="top",
+            ha="left" if right else "right",
+            va="bottom" if up else "top",
             path_effects=halo,
             zorder=6,
         )

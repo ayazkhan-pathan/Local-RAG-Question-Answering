@@ -10,18 +10,22 @@ Usage:
     python scripts/evaluate_answers.py --preset original  # the first version's retrieval
     python scripts/evaluate_answers.py --model Qwen/Qwen2.5-0.5B-Instruct --out runs/try
 
-Every generation is cached in runs/answers/generations.jsonl, so a rerun only does what is
-missing. Writes results/answers.jsonl (every output), results/answers_summary.json and
-results/hand_check.csv (a fixed sample to check by hand).
+Retrieval runs first for every question; the embedding model is then released before the
+language model loads, so the two never sit in memory together (bge-large and Qwen2.5-1.5B
+together overfill an 8 GB machine). Every generation is cached in runs/answers/generations.jsonl,
+so a rerun only does what is missing. Writes results/answers.jsonl (every output),
+results/answers_summary.json and results/hand_check.csv (a fixed sample to check by hand).
 """
 
 from __future__ import annotations
 
 import argparse
 import csv
+import gc
 import hashlib
 import json
 import platform
+import statistics
 import time
 from pathlib import Path
 
@@ -81,6 +85,19 @@ class CachedGenerator:
         return self.cache[self.key(prompt)]["seconds"]
 
 
+def free_memory() -> None:
+    """Collect garbage and return cached accelerator memory to the system."""
+    gc.collect()
+    try:
+        import torch
+    except ImportError:
+        return
+    if torch.backends.mps.is_available():
+        torch.mps.empty_cache()
+    elif torch.cuda.is_available():
+        torch.cuda.empty_cache()
+
+
 def best_settings(results: Path) -> Settings:
     path = results / "retrieval_best.json"
     if not path.exists():
@@ -126,12 +143,20 @@ def main() -> None:
     books = load_books(args.data)
     chunks = store.chunks()
     questions = load_questions(args.questions)
+    started = time.perf_counter()
+
+    # Retrieve for every question first, then let the embedding model go before generation.
+    retrieved_for = {
+        q.id: answer_question(store, q.question, None, settings.k, settings.threshold)
+        for q in questions
+    }
+    del store
+    free_memory()
 
     local = LocalGenerator(args.model, args.device, args.max_new_tokens)
     generator = CachedGenerator(local, runs / "generations.jsonl")
     label = model_label(args.model)
     records = []
-    started = time.perf_counter()
     for number, question in enumerate(questions, start=1):
         sample = question.off_topic or number % HAND_CHECK_EVERY == 0
         base = {
@@ -157,9 +182,9 @@ def main() -> None:
                 )
             )
 
-        result = answer_question(
-            store, question.question, generator, settings.k, settings.threshold
-        )
+        result = retrieved_for[question.id]
+        if result.passed:
+            result.text = generator.generate(result.prompt)
         gold: list[str] = []
         if not question.off_topic:
             book, span = locate_quote(books, question.quote)
@@ -213,7 +238,8 @@ def main() -> None:
         "off_topic_gated": sum(r["gated"] for r in rag_off),
         "off_topic_declined_by_model": sum(r["declined"] for r in rag_off),
         "off_topic_answered": sum(not r["gated"] and not r["declined"] for r in rag_off),
-        "mean_seconds_per_answer": round(sum(timed) / len(timed), 2) if timed else None,
+        # The median, because a few generations stall for minutes when the machine swaps.
+        "median_seconds_per_answer": round(statistics.median(timed), 2) if timed else None,
         "new_generations": generator.new,
         "wall_seconds": round(time.perf_counter() - started, 1),
         "rag_local": __version__,
@@ -225,7 +251,13 @@ def main() -> None:
         for record in records:
             handle.write(json.dumps(record, ensure_ascii=False) + "\n")
     (out / "answers_summary.json").write_text(json.dumps(summary, indent=2) + "\n")
-    with open(out / "hand_check.csv", "w", newline="", encoding="utf-8") as handle:
+    hand_path = out / "hand_check.csv"
+    marked = {}  # keep verdicts already entered by hand when the file is rewritten
+    if hand_path.exists():
+        with open(hand_path, newline="", encoding="utf-8") as handle:
+            for row in csv.DictReader(handle):
+                marked[(row["id"], row["mode"], row["output"])] = row["hand_correct"]
+    with open(hand_path, "w", newline="", encoding="utf-8") as handle:
         writer = csv.writer(handle, lineterminator="\n")
         writer.writerow(
             ["id", "mode", "question", "gold", "output", "auto_correct", "hand_correct"]
@@ -233,7 +265,8 @@ def main() -> None:
         for r in records:
             if r["hand_check"]:
                 row = [r["id"], r["mode"], r["question"], r["answer"] or "", r["output"]]
-                writer.writerow([*row, r.get("correct", ""), ""])
+                hand = marked.get((r["id"], r["mode"], r["output"]), "")
+                writer.writerow([*row, r.get("correct", ""), hand])
 
     n = summary["questions"]
     print(f"\n{label}, retrieval {settings.label()}, k={settings.k}")
